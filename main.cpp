@@ -13,6 +13,7 @@
 
 void key_callback(GLFWwindow* window, int key, int scancode, int action, int mode);
 
+GLfloat mixValue = 0.2f;
 //Shaders
 const GLchar* vertexShaderSource = "#version 330 core\n"
 	"layout (location = 0) in vec3 position;\n"
@@ -32,13 +33,15 @@ const GLchar* fragmentShaderSource= "#version 330 core\n"
 	"in vec2 texCoor;\n"
 	"out vec4 color;\n"
 
+	"uniform float mixValue;\n"
+
 	"uniform sampler2D ourTexture;\n"
 	"uniform sampler2D ourTexture1;\n"
 	"void main()\n"
 	"{\n"
 //	"color = vec4(vColor, 1.0f);\n"
 //	"color = texture(ourTexture, texCoor)* vec4(vColor, 1.0f);\n"
-	"color = mix(texture(ourTexture, texCoor), texture(ourTexture1, texCoor), 0.5);\n"
+	"color = mix(texture(ourTexture, texCoor), texture(ourTexture1, texCoor), mixValue);\n"
 	"}\0";
 
 int main(int argc, char** argv)
@@ -212,7 +215,9 @@ int main(int argc, char** argv)
         glBindTexture(GL_TEXTURE_2D, texture1);
         glUniform1i(glGetUniformLocation(shaderProgram, "ourTexture1"), 1);       
 
-glBindVertexArray(VAO);
+	glUniform1f(glGetUniformLocation(shaderProgram, "mixValue"), mixValue);
+	
+	glBindVertexArray(VAO);
       //  glDrawArrays(GL_TRIANGLES, 0, 3);
        
         glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
@@ -233,5 +238,13 @@ glBindVertexArray(VAO);
     void key_callback(GLFWwindow* window,int key,int scancode,int action,int mode){
 	if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS)
 			glfwSetWindowShouldClose(window, GL_TRUE);
-    }
-
+	if (key == GLFW_KEY_UP && action == GLFW_PRESS){
+			mixValue += 0.1f;
+			if (mixValue >= 1.0f)
+				mixValue = 1.0f;
+    }	if (key == GLFW_KEY_DOWN && action == GLFW_PRESS){
+			mixValue -= 0.1f;
+			if (mixValue <= 0.0f)
+				mixValue = 0.0f;
+}
+}
