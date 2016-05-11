@@ -24,7 +24,7 @@ const GLchar* vertexShaderSource = "#version 330 core\n"
 	"{\n"
 	"gl_Position = vec4(position, 1.0);\n"
         "vColor = ourcolor;\n"
-	"texCoor = textCoor;\n"
+	"texCoor = vec2(textCoor.x, 1.0f-textCoor.y);\n"
 	"}\0";
 
 const GLchar* fragmentShaderSource= "#version 330 core\n"
@@ -33,11 +33,12 @@ const GLchar* fragmentShaderSource= "#version 330 core\n"
 	"out vec4 color;\n"
 
 	"uniform sampler2D ourTexture;\n"
-
+	"uniform sampler2D ourTexture1;\n"
 	"void main()\n"
 	"{\n"
 //	"color = vec4(vColor, 1.0f);\n"
-	"color = texture(ourTexture, texCoor)* vec4(vColor, 1.0f);\n"
+//	"color = texture(ourTexture, texCoor)* vec4(vColor, 1.0f);\n"
+	"color = mix(texture(ourTexture, texCoor), texture(ourTexture1, texCoor), 0.5);\n"
 	"}\0";
 
 int main(int argc, char** argv)
@@ -133,7 +134,23 @@ int main(int argc, char** argv)
     glGenerateMipmap(GL_TEXTURE_2D);
     SOIL_free_image_data(image);
     glBindTexture(GL_TEXTURE_2D, 0);
-	
+   //next image    
+    image = SOIL_load_image("arrow.jpg", &w, &h, 0, SOIL_LOAD_RGB);
+    GLuint texture1;
+    glGenTextures(1, &texture1);
+    glBindTexture(GL_TEXTURE_2D, texture1);
+        // Set the texture wrapping parameters
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);	// Set texture wrapping to GL_REPEAT (usually basic wrapping method)
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+    // Set texture filtering parameters
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, w, h, 0, GL_RGB, GL_UNSIGNED_BYTE, image);
+    glGenerateMipmap(GL_TEXTURE_2D);
+    SOIL_free_image_data(image);
+    glBindTexture(GL_TEXTURE_2D, 0);
+
     GLfloat vertices[] = {
          //position		//color		//texture
 	0.5f,  0.5f, 0.0f,   1.0f, 0.0f, 0.0f,  1.0f, 1.0f,  // Top Right
@@ -186,8 +203,16 @@ int main(int argc, char** argv)
       
          // Draw our first triangle
         glUseProgram(shaderProgram);
-     glBindTexture(GL_TEXTURE_2D, texture);   
-     glBindVertexArray(VAO);
+    // glBindTexture(GL_TEXTURE_2D, texture);   
+    // Bind Textures using texture units
+        glActiveTexture(GL_TEXTURE0);
+        glBindTexture(GL_TEXTURE_2D, texture);
+        glUniform1i(glGetUniformLocation(shaderProgram, "ourTexture"), 0);
+        glActiveTexture(GL_TEXTURE1);
+        glBindTexture(GL_TEXTURE_2D, texture1);
+        glUniform1i(glGetUniformLocation(shaderProgram, "ourTexture1"), 1);       
+
+glBindVertexArray(VAO);
       //  glDrawArrays(GL_TRIANGLES, 0, 3);
        
         glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
