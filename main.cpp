@@ -17,14 +17,17 @@ GLfloat mixValue = 0.2f;
 //Shaders
 const GLchar* vertexShaderSource = "#version 330 core\n"
 	"layout (location = 0) in vec3 position;\n"
-        "layout (location = 1) in vec3 ourcolor;\n"
+   //     "layout (location = 1) in vec3 ourcolor;\n"
 	"layout (location = 2) in vec2 textCoor;\n"
         "out vec3 vColor;\n"
 	"out vec2 texCoor;\n"
+	"uniform mat4 model;\n"
+	"uniform mat4 view;\n"
+	"uniform mat4 projection;\n"
 	"void main()\n"
 	"{\n"
-	"gl_Position = vec4(position, 1.0);\n"
-        "vColor = ourcolor;\n"
+	"gl_Position = projection * view * model * vec4(position, 1.0);\n"
+     //   "vColor = ourcolor;\n"
 	"texCoor = vec2(textCoor.x, 1.0f-textCoor.y);\n"
 	"}\0";
 
@@ -114,6 +117,10 @@ int main(int argc, char** argv)
     glDeleteShader(vertexShader);
     glDeleteShader(fragmentShader);
 
+    glm::mat4 trans;
+    trans = glm::rotate(trans, glm::radians(90.0f), glm::vec3(0.0f, 0.0f, 1.0f));
+    trans = glm::scale(trans, glm::vec3(0.5f, 0.5f, 0.5f));
+
 //Setup the vertex data
 //GLfloat vertices[] = {
 //  0.5f, -0.5f, 0.0f, 1.0f, 0.0f, 0.0f, // Left  
@@ -154,39 +161,89 @@ int main(int argc, char** argv)
     SOIL_free_image_data(image);
     glBindTexture(GL_TEXTURE_2D, 0);
 
+//    GLfloat vertices[] = {
+//         //position		//color		//texture
+//	0.5f,  0.5f, 0.0f,   1.0f, 0.0f, 0.0f,  1.0f, 1.0f,  // Top Right
+//         0.5f, -0.5f, 0.0f,  0.0f, 1.0f, 0.0f,  1.0f, 0.0f,// Bottom Right
+//        -0.5f, -0.5f, 0.0f,  0.0f, 0.0f, 1.0f,  0.0f, 0.0f,// Bottom Left
+//        -0.5f,  0.5f, 0.0f,   1.0f, 1.0f, 0.0f,  0.0f, 1.0f// Top Left 
+//    };
+//    GLuint indices[] = {  // Note that we start from 0!
+//        0, 1, 3,  // First Triangle
+//        1, 2, 3   // Second Triangle
+//    };
     GLfloat vertices[] = {
-         //position		//color		//texture
-	0.5f,  0.5f, 0.0f,   1.0f, 0.0f, 0.0f,  1.0f, 1.0f,  // Top Right
-         0.5f, -0.5f, 0.0f,  0.0f, 1.0f, 0.0f,  1.0f, 0.0f,// Bottom Right
-        -0.5f, -0.5f, 0.0f,  0.0f, 0.0f, 1.0f,  0.0f, 0.0f,// Bottom Left
-        -0.5f,  0.5f, 0.0f,   1.0f, 1.0f, 0.0f,  0.0f, 1.0f// Top Left 
-    };
-    GLuint indices[] = {  // Note that we start from 0!
-        0, 1, 3,  // First Triangle
-        1, 2, 3   // Second Triangle
-    };
-    
-    GLuint VBO, VAO, EBO;
+    -0.5f, -0.5f, -0.5f,  0.0f, 0.0f,
+     0.5f, -0.5f, -0.5f,  1.0f, 0.0f,
+     0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
+     0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
+    -0.5f,  0.5f, -0.5f,  0.0f, 1.0f,
+    -0.5f, -0.5f, -0.5f,  0.0f, 0.0f,
+
+    -0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
+     0.5f, -0.5f,  0.5f,  1.0f, 0.0f,
+     0.5f,  0.5f,  0.5f,  1.0f, 1.0f,
+     0.5f,  0.5f,  0.5f,  1.0f, 1.0f,
+    -0.5f,  0.5f,  0.5f,  0.0f, 1.0f,
+    -0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
+
+    -0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
+    -0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
+    -0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
+    -0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
+    -0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
+    -0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
+
+     0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
+     0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
+     0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
+     0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
+     0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
+     0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
+
+    -0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
+     0.5f, -0.5f, -0.5f,  1.0f, 1.0f,
+     0.5f, -0.5f,  0.5f,  1.0f, 0.0f,
+     0.5f, -0.5f,  0.5f,  1.0f, 0.0f,
+    -0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
+    -0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
+
+    -0.5f,  0.5f, -0.5f,  0.0f, 1.0f,
+     0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
+     0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
+     0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
+    -0.5f,  0.5f,  0.5f,  0.0f, 0.0f,
+    -0.5f,  0.5f, -0.5f,  0.0f, 1.0f
+};
+
+    glm::mat4 model;
+    model = glm::rotate(model, (GLfloat)glfwGetTime() * glm::radians(50.0f), glm::vec3(0.5f, 1.0f, 0.0f));
+    glm::mat4 view;
+    view = glm::translate(view, glm::vec3(0.0f, 0.0f, -3.0f));
+    glm::mat4 projection;
+    projection = glm::perspective(glm::radians(45.0f), (float)800/600, 0.1f, 100.0f);
+ glEnable(GL_DEPTH_TEST);
+    GLuint VBO, VAO;
     glGenVertexArrays(1, &VAO);
     glGenBuffers(1, &VBO);
-    glGenBuffers(1, &EBO);
+  //  glGenBuffers(1, &EBO);
     //Bind
     glBindVertexArray(VAO);
 
     glBindBuffer(GL_ARRAY_BUFFER, VBO);    
     glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
 
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
-    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
+  //  glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
+  //  glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
 
   //position 
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(GLfloat), (GLvoid*)0);
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(GLfloat), (GLvoid*)0);
     glEnableVertexAttribArray(0);
 //color
-    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(GLfloat), (GLvoid*)(3*sizeof(GLfloat)));
-    glEnableVertexAttribArray(1);
+  //  glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(GLfloat), (GLvoid*)(3*sizeof(GLfloat)));
+  //  glEnableVertexAttribArray(1);
     // textures
-    glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 8* sizeof(GLfloat), (GLvoid*)(6*sizeof(GLfloat)));
+    glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 5* sizeof(GLfloat), (GLvoid*)(3*sizeof(GLfloat)));
     glEnableVertexAttribArray(2);
 
    // glBindBuffer(GL_ARRAY_BUFFER, 0);
@@ -198,7 +255,22 @@ int main(int argc, char** argv)
         // Fetch and process any queued events on the window.
         glfwPollEvents();
         // Actual opengl rendering code.
+	 glm::mat4 model;
+    model = glm::rotate(model, (GLfloat)glfwGetTime() * glm::radians(50.0f), glm::vec3(0.5f, 1.0f, 0.0f));
+    glm::mat4 view;
+    view = glm::translate(view, glm::vec3(0.0f, 0.0f, -3.0f));
+    glm::mat4 projection;
+    projection = glm::perspective(glm::radians(45.0f), (float)800/600, 0.1f, 100.0f);
 
+GLint modelLoc = glGetUniformLocation(shaderProgram, "model");
+glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
+
+
+GLint viewLoc = glGetUniformLocation(shaderProgram, "view");
+glUniformMatrix4fv(viewLoc, 1, GL_FALSE, glm::value_ptr(view));
+
+GLint projLoc = glGetUniformLocation(shaderProgram, "projection");
+glUniformMatrix4fv(projLoc, 1, GL_FALSE, glm::value_ptr(projection));
         // Set clear (background) color to (0.3, 0.3, 0.3).
         glClearColor(0.2f, 0.6f, 1.0f, 1.0f);
         // Clear the background as well as depth buffers.
@@ -206,6 +278,7 @@ int main(int argc, char** argv)
       
          // Draw our first triangle
         glUseProgram(shaderProgram);
+
     // glBindTexture(GL_TEXTURE_2D, texture);   
     // Bind Textures using texture units
         glActiveTexture(GL_TEXTURE0);
@@ -216,11 +289,14 @@ int main(int argc, char** argv)
         glUniform1i(glGetUniformLocation(shaderProgram, "ourTexture1"), 1);       
 
 	glUniform1f(glGetUniformLocation(shaderProgram, "mixValue"), mixValue);
+        
+	GLuint transloc = glGetUniformLocation(shaderProgram, "transform");
+	glUniformMatrix4fv(transloc, 1, GL_FALSE, glm::value_ptr(trans));	
 	
 	glBindVertexArray(VAO);
-      //  glDrawArrays(GL_TRIANGLES, 0, 3);
+        glDrawArrays(GL_TRIANGLES, 0, 36);
        
-        glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+    //    glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
         glBindVertexArray(0);
 
         // Swap the rendered screen to window.
@@ -229,7 +305,7 @@ int main(int argc, char** argv)
      // Properly de-allocate all resources once they've outlived their purpose
     glDeleteVertexArrays(1, &VAO);
     glDeleteBuffers(1, &VBO);
-    glDeleteBuffers(1, &EBO);
+  //  glDeleteBuffers(1, &EBO);
     
     // Once the main loop ends, exit by destroying the window.
     glfwTerminate();
