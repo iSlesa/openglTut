@@ -10,9 +10,18 @@
 
 // SOIL is Simple OpenGL Image Library used to load textures.
 #include <SOIL/SOIL.h>
-
+bool firstMouse = true;
+GLfloat fov =  45.0f;
+double lastX=400.0, lastY=300.0;
+GLfloat yaw=-90.0f, pitch=0.0f;    
+glm::vec3 cameraPos   = glm::vec3(0.0f, 0.0f,  9.0f);
+glm::vec3 cameraFront = glm::vec3(0.0f, 0.0f, -1.0f);
+glm::vec3 cameraUp    = glm::vec3(0.0f, 1.0f,  0.0f);
+ 
+void mouse_callback(GLFWwindow* window, double xpos, double ypos);
 void key_callback(GLFWwindow* window, int key, int scancode, int action, int mode);
 
+void scroll_callback(GLFWwindow* window, double xoffset, double yoffset);
 GLfloat mixValue = 0.2f;
 //Shaders
 const GLchar* vertexShaderSource = "#version 330 core\n"
@@ -64,7 +73,9 @@ int main(int argc, char** argv)
 
     glfwMakeContextCurrent(window);
     glfwSetKeyCallback(window, key_callback);
-
+    glfwSetCursorPosCallback(window, mouse_callback); 
+    glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+glfwSetScrollCallback(window, scroll_callback);  
     // Initialize glew to load OpenGL extensions supported by drivers.
     glewExperimental = GL_TRUE;
     if (glewInit() != GLEW_OK) {
@@ -216,12 +227,12 @@ int main(int argc, char** argv)
     -0.5f,  0.5f, -0.5f,  0.0f, 1.0f
 };
 
-    glm::mat4 model;
-    model = glm::rotate(model, (GLfloat)glfwGetTime() * glm::radians(50.0f), glm::vec3(0.5f, 1.0f, 0.0f));
-    glm::mat4 view;
-    view = glm::translate(view, glm::vec3(0.0f, 0.0f, -3.0f));
-    glm::mat4 projection;
-    projection = glm::perspective(glm::radians(45.0f), (float)800/600, 0.1f, 100.0f);
+  //  glm::mat4 model;
+  //  model = glm::rotate(model, (GLfloat)glfwGetTime() * glm::radians(50.0f), glm::vec3(0.5f, 1.0f, 0.0f));
+  //  glm::mat4 view;
+  //  view = glm::lookAt(glm::vec3(0.0f, 0.0f, -3.0f), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f));
+  //  glm::mat4 projection;
+  //  projection = glm::perspective(glm::radians(45.0f), (float)800/600, 0.1f, 100.0f);
  glEnable(GL_DEPTH_TEST);
     GLuint VBO, VAO;
     glGenVertexArrays(1, &VAO);
@@ -248,19 +259,19 @@ int main(int argc, char** argv)
 
    // glBindBuffer(GL_ARRAY_BUFFER, 0);
     glBindVertexArray(0);
-
-    // The main loop ends when the window should close.
+   // The main loop ends when the window should close.
     while (!glfwWindowShouldClose(window)) {
         
         // Fetch and process any queued events on the window.
         glfwPollEvents();
         // Actual opengl rendering code.
 	 glm::mat4 model;
-    model = glm::rotate(model, (GLfloat)glfwGetTime() * glm::radians(50.0f), glm::vec3(0.5f, 1.0f, 0.0f));
+    model = glm::rotate(model, glm::radians(50.0f), glm::vec3(0.5f, 1.0f, 0.0f));
     glm::mat4 view;
-    view = glm::translate(view, glm::vec3(0.0f, 0.0f, -3.0f));
+   // view = glm::translate(view, glm::vec3(0.0f, 0.0f, -3.0f));
+    view = glm::lookAt(cameraPos, cameraPos + cameraFront, cameraUp);
     glm::mat4 projection;
-    projection = glm::perspective(glm::radians(45.0f), (float)800/600, 0.1f, 100.0f);
+    projection = glm::perspective(glm::radians(fov), (float)800/600, 0.1f, 100.0f);
 
 GLint modelLoc = glGetUniformLocation(shaderProgram, "model");
 glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
@@ -324,3 +335,43 @@ glUniformMatrix4fv(projLoc, 1, GL_FALSE, glm::value_ptr(projection));
 				mixValue = 0.0f;
 }
 }
+    void mouse_callback(GLFWwindow* window, double xpos, double ypos){
+ if(firstMouse)
+    {
+        lastX = xpos;
+        lastY = ypos;
+        firstMouse = false;
+    }
+  
+    GLfloat xoffset = xpos - lastX;
+    GLfloat yoffset = lastY - ypos; 
+    lastX = xpos;
+    lastY = ypos;
+
+    GLfloat sensitivity = 0.5;
+    xoffset *= sensitivity;
+    yoffset *= sensitivity;
+
+    yaw   += xoffset;
+    pitch += yoffset;
+
+    if(pitch > 89.0f)
+        pitch = 89.0f;
+    if(pitch < -89.0f)
+        pitch = -89.0f;
+
+    glm::vec3 front;
+    front.x = cos(glm::radians(yaw)) * cos(glm::radians(pitch));
+    front.y = sin(glm::radians(pitch));
+    front.z = sin(glm::radians(yaw)) * cos(glm::radians(pitch));
+    cameraFront = glm::normalize(front);
+}
+void scroll_callback(GLFWwindow* window, double xoffset, double yoffset)
+{
+  if(fov >= 1.0f && fov <= 45.0f)
+  	fov -= yoffset;
+  if(fov <= 1.0f)
+  	fov = 1.0f;
+  if(fov >= 45.0f)
+  	fov = 45.0f;
+}	
