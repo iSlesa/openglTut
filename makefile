@@ -14,7 +14,7 @@ CXX := g++
 CXXLIBS := `pkg-config --cflags glfw3`
 LDLIBS := -lGLEW -lGL `pkg-config --libs --static glfw3` -lSOIL
 
-CXXFLAGS := -MMD --std=c++11 $(CXXLIBS)
+CXXFLAGS := -I include -MMD --std=c++11 $(CXXLIBS)
 LDFLAGS := -std=c++11 $(LDLIBS)
 
 
