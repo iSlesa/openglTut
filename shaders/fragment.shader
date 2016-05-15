@@ -17,6 +17,7 @@ struct fLight {
 
 in vec3 fNormal;
 in vec3 fragPosition;
+in vec2 textureCoor;
 
 out vec4 color;
 

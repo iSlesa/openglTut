@@ -12,7 +12,7 @@ OBJ_FILES = $(addprefix $(OBJ_DIR)/,$(CPP_FILES:%.cpp=%.o))
 ## Compiler, compiler and linker flags and libaries to use
 CXX := g++
 CXXLIBS := `pkg-config --cflags glfw3`
-LDLIBS := -lGLEW -lGL `pkg-config --libs --static glfw3` -lSOIL
+LDLIBS := -lGLEW -lGL `pkg-config --libs --static glfw3` -lSOIL -lassimp
 
 CXXFLAGS := -I include -MMD --std=c++11 $(CXXLIBS)
 LDFLAGS := -std=c++11 $(LDLIBS)

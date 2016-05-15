@@ -20,6 +20,7 @@
 //include shader and camera class
 #include <Shader.h>
 #include <Camera.h>
+#include <Model.h>
 
 const GLuint SCREEN_WIDTH = 800, SCREEN_HEIGHT = 600;
 bool firstMouse = true;
@@ -67,81 +68,8 @@ int main(int argc, char** argv)
     //Build and compiler our shaders
     Shader shader("shaders/vertex.shader", "shaders/fragment.shader");
     Shader lampShader("shaders/lampVertex.shader", "shaders/lampFrag.shader");
+    Model nanoSuit("nanosuit/nanosuit.obj");
 
-    // Vertices of a cubical box
-    GLfloat vertices[] = {
-        -0.5f, -0.5f, -0.5f,  0.0f,  0.0f, -1.0f,
-         0.5f, -0.5f, -0.5f,  0.0f,  0.0f, -1.0f,
-         0.5f,  0.5f, -0.5f,  0.0f,  0.0f, -1.0f,
-         0.5f,  0.5f, -0.5f,  0.0f,  0.0f, -1.0f,
-        -0.5f,  0.5f, -0.5f,  0.0f,  0.0f, -1.0f,
-        -0.5f, -0.5f, -0.5f,  0.0f,  0.0f, -1.0f,
-
-        -0.5f, -0.5f,  0.5f,  0.0f,  0.0f,  1.0f,
-         0.5f, -0.5f,  0.5f,  0.0f,  0.0f,  1.0f,
-         0.5f,  0.5f,  0.5f,  0.0f,  0.0f,  1.0f,
-         0.5f,  0.5f,  0.5f,  0.0f,  0.0f,  1.0f,
-        -0.5f,  0.5f,  0.5f,  0.0f,  0.0f,  1.0f,
-        -0.5f, -0.5f,  0.5f,  0.0f,  0.0f,  1.0f,
-
-        -0.5f,  0.5f,  0.5f, -1.0f,  0.0f,  0.0f,
-        -0.5f,  0.5f, -0.5f, -1.0f,  0.0f,  0.0f,
-        -0.5f, -0.5f, -0.5f, -1.0f,  0.0f,  0.0f,
-        -0.5f, -0.5f, -0.5f, -1.0f,  0.0f,  0.0f,
-        -0.5f, -0.5f,  0.5f, -1.0f,  0.0f,  0.0f,
-        -0.5f,  0.5f,  0.5f, -1.0f,  0.0f,  0.0f,
-
-         0.5f,  0.5f,  0.5f,  1.0f,  0.0f,  0.0f,
-         0.5f,  0.5f, -0.5f,  1.0f,  0.0f,  0.0f,
-         0.5f, -0.5f, -0.5f,  1.0f,  0.0f,  0.0f,
-         0.5f, -0.5f, -0.5f,  1.0f,  0.0f,  0.0f,
-         0.5f, -0.5f,  0.5f,  1.0f,  0.0f,  0.0f,
-         0.5f,  0.5f,  0.5f,  1.0f,  0.0f,  0.0f,
-
-        -0.5f, -0.5f, -0.5f,  0.0f, -1.0f,  0.0f,
-         0.5f, -0.5f, -0.5f,  0.0f, -1.0f,  0.0f,
-         0.5f, -0.5f,  0.5f,  0.0f, -1.0f,  0.0f,
-         0.5f, -0.5f,  0.5f,  0.0f, -1.0f,  0.0f,
-        -0.5f, -0.5f,  0.5f,  0.0f, -1.0f,  0.0f,
-        -0.5f, -0.5f, -0.5f,  0.0f, -1.0f,  0.0f,
-
-        -0.5f,  0.5f, -0.5f,  0.0f,  1.0f,  0.0f,
-         0.5f,  0.5f, -0.5f,  0.0f,  1.0f,  0.0f,
-         0.5f,  0.5f,  0.5f,  0.0f,  1.0f,  0.0f,
-         0.5f,  0.5f,  0.5f,  0.0f,  1.0f,  0.0f,
-        -0.5f,  0.5f,  0.5f,  0.0f,  1.0f,  0.0f,
-        -0.5f,  0.5f, -0.5f,  0.0f,  1.0f,  0.0f
-    };
-// Container
-    GLuint VBO, VAO;
-    glGenVertexArrays(1, &VAO);
-    glGenBuffers(1, &VBO);
-    //Bind
-    glBindVertexArray(VAO);
-
-    glBindBuffer(GL_ARRAY_BUFFER, VBO);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
-
-  //  glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
-  //  glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
-
-  //position
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(GLfloat), (GLvoid*)0);
-    glEnableVertexAttribArray(0);
-    // normal
-    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(GLfloat), (GLvoid*)(3 * sizeof(GLfloat)) );
-    glEnableVertexAttribArray(1);
-
-   // glBindBuffer(GL_ARRAY_BUFFER, 0);
-    glBindVertexArray(0);
-//Light cube
-    GLuint lightVAO;
-    glGenVertexArrays(1, &lightVAO);
-    glBindVertexArray(lightVAO);
-    glBindBuffer(GL_ARRAY_BUFFER, VBO);
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(GLfloat), (GLvoid*)0);
-    glEnableVertexAttribArray(0);
-    glBindVertexArray(0);
    // The main loop ends when the window should close.
     while (!glfwWindowShouldClose(window)) {
 
@@ -154,7 +82,7 @@ int main(int argc, char** argv)
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     //Draw the conatiner cube first
 	  glm::mat4 model;
-    model = glm::rotate(model,  glm::radians((GLfloat)glfwGetTime() *50.0f), glm::vec3(0.5f, 1.0f, 0.0f));
+    model = glm::translate(model, glm::vec3(0.0f, -1.75f, 0.0f));
     glm::mat4 view;
     view = cam.getViewMatrix();
     glm::mat4 projection;
@@ -186,36 +114,12 @@ int main(int argc, char** argv)
     glUniform1f(glGetUniformLocation(shader.Program, "material.shininess"), 32.0f);
 
     shader.use();
-	  glBindVertexArray(VAO);
-    glDrawArrays(GL_TRIANGLES, 0, 36);
-    glBindVertexArray(0);
+	  nanoSuit.Draw(shader);
 
-    //Draw the lamp
 
-    // Get location objects for the matrices on the lamp shader (these could be different on a different shader)
-    modelLoc = glGetUniformLocation(lampShader.Program, "model");
-    mvpLoc  = glGetUniformLocation(lampShader.Program, "mvp");
-    // Set matrices
-    model = glm::mat4();
-    model = glm::translate(model, lightPos);
-    model = glm::scale(model, glm::vec3(0.2f)); // Make it a smaller cube
-    glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
-    mvp = projection * view * model;
-    glUniformMatrix4fv(mvpLoc, 1, GL_FALSE, glm::value_ptr(mvp));
-    // Draw the light object (using light's vertex attributes)
-  //  lampShader.use();
-    //glBindVertexArray(lightVAO);
-  //  glDrawArrays(GL_TRIANGLES, 0, 36);
-    //glBindVertexArray(0);
-    // Swap the rendered screen to window.
     glfwSwapBuffers(window);
 
     }
-     // Properly de-allocate all resources once they've outlived their purpose
-    glDeleteVertexArrays(1, &VAO);
-    glDeleteVertexArrays(1, &lightVAO);
-    glDeleteBuffers(1, &VBO);
-
     // Once the main loop ends, exit by destroying the window.
     glfwTerminate();
     return 0;
