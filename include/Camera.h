@@ -15,7 +15,7 @@
 const GLfloat YAW        = -90.0f;
 const GLfloat PITCH      =  0.0f;
 const GLfloat SENSITIVITY =  0.25f;
-const GLfloat ZOOM       =  45.0f;
+const GLfloat ZOOM       =  90.0f;
 
 class Camera{
     private:
@@ -56,12 +56,12 @@ class Camera{
         }
         //Mouse scroll processing function
         void processMouseScroll(GLfloat yOffset){
-            if (this->Zoom >= 1.0f && this->Zoom <= 45.0f)
+            if (this->Zoom >= 1.0f && this->Zoom <= 90.0f)
                 this->Zoom -= yOffset;
             if (this->Zoom <= 1.0f)
                 this->Zoom = 1.0f;
-            if (this->Zoom >= 45.0f)
-                this->Zoom = 45.0f;
+            if (this->Zoom >= 90.0f)
+                this->Zoom = 90.0f;
         }
         void updateCameraVectors(){
             glm::vec3 front;

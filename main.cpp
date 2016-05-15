@@ -154,7 +154,7 @@ int main(int argc, char** argv)
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     //Draw the conatiner cube first
 	  glm::mat4 model;
-    model = glm::rotate(model, glm::radians(50.0f), glm::vec3(0.5f, 1.0f, 0.0f));
+    model = glm::rotate(model,  glm::radians((GLfloat)glfwGetTime() *50.0f), glm::vec3(0.5f, 1.0f, 0.0f));
     glm::mat4 view;
     view = cam.getViewMatrix();
     glm::mat4 projection;
@@ -175,7 +175,7 @@ int main(int argc, char** argv)
     lightColor.y = sin(glfwGetTime() * 0.7f);
     lightColor.z = sin(glfwGetTime() * 1.3f);
     glm::vec3 diffuseColor = lightColor * glm::vec3(0.5f); // Decrease the influence
-    glm::vec3 ambientColor = diffuseColor * glm::vec3(0.2f); // Low influence
+    glm::vec3 ambientColor = diffuseColor * glm::vec3(0.8f); // Low influence
     glUniform3f(glGetUniformLocation(shader.Program, "light.ambient"),  ambientColor.x, ambientColor.y, ambientColor.z);
     glUniform3f(glGetUniformLocation(shader.Program, "light.diffuse"),  diffuseColor.x, diffuseColor.y, diffuseColor.z);
     glUniform3f(glGetUniformLocation(shader.Program, "light.specular"), 1.0f, 1.0f, 1.0f);
