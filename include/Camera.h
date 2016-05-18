@@ -1,5 +1,4 @@
 #pragma once
-
 // GL Includes
 #define GLM_FORCE_RADIANS
 #include <glm/glm.hpp>
@@ -29,14 +28,17 @@ class Camera{
         GLfloat Zoom;
         glm::vec3 mPosition;
         //Camera Constructor
-        Camera(glm::vec3 position = glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3 up = glm::vec3(0.0f, 1.0f, 0.0f)): mYaw(YAW), mPitch(PITCH), Zoom(ZOOM), mSensitivity(SENSITIVITY){
+        Camera(glm::vec3 position = glm::vec3(0.0f, 0.0f, 0.0f),
+                glm::vec3 up = glm::vec3(0.0f, 1.0f, 0.0f)):
+                mYaw(YAW), mPitch(PITCH), Zoom(ZOOM), mSensitivity(SENSITIVITY){
             this->mPosition = position;
             this->mWorldUp = up;
             this->updateCameraVectors();
         }
 
         glm::mat4 getViewMatrix(){
-             return glm::lookAt(this->mPosition, this->mPosition + this->mFront, this->mUp);
+             // return glm::lookAt(this->mPosition, this->mPosition + this->mFront, this->mUp);
+             return glm::lookAt(this->mPosition, glm::vec3(0), this->mUp);
         }
 
         //MOuse input processing function
@@ -64,13 +66,14 @@ class Camera{
                 this->Zoom = 90.0f;
         }
         void updateCameraVectors(){
-            glm::vec3 front;
-            front.x = cos(glm::radians(mYaw)) * cos(glm::radians(mPitch));
-            front.y = sin(glm::radians(mPitch));
-            front.z = sin(glm::radians(mYaw)) * cos(glm::radians(mPitch));
-            this->mFront = glm::normalize(front);
+            glm::vec3 position;
+            position.x = cos(glm::radians(mYaw)) * cos(glm::radians(mPitch));
+            position.y = sin(glm::radians(mPitch));
+            position.z = sin(glm::radians(mYaw)) * cos(glm::radians(mPitch));
+            this->mPosition = 8.0f*glm::normalize(position);
+            glm::vec3 front = glm::vec3(0)- this->mPosition;
             //recalculate the right and up vector
-            this->mRight = glm::normalize(glm::cross(this->mFront, this->mWorldUp));
-            this->mUp = glm::normalize(glm::cross(this->mRight, this->mFront));
+            this->mRight = glm::normalize(glm::cross(front, this->mWorldUp));
+            this->mUp = glm::normalize(glm::cross(this->mRight, front));
         }
     };
