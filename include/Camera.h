@@ -11,10 +11,10 @@
 #include <vector>
 
 // Default camera values
-const GLfloat YAW        = -90.0f;
+const GLfloat YAW        = 90.0f;
 const GLfloat PITCH      =  0.0f;
 const GLfloat SENSITIVITY =  0.25f;
-const GLfloat ZOOM       =  90.0f;
+const GLfloat ZOOM       =  1.0f;
 
 class Camera{
     private:
@@ -58,20 +58,22 @@ class Camera{
         }
         //Mouse scroll processing function
         void processMouseScroll(GLfloat yOffset){
-            if (this->Zoom >= 1.0f && this->Zoom <= 90.0f)
-                this->Zoom -= yOffset;
+            this->Zoom -= yOffset;
             if (this->Zoom <= 1.0f)
-                this->Zoom = 1.0f;
-            if (this->Zoom >= 90.0f)
-                this->Zoom = 90.0f;
+                 this->Zoom = 1.0f;
+            this->updateCameraVectors();
+            // if (this->Zoom >= 1.0f && this->Zoom <= 90.0f)
+            //     this->Zoom -= yOffset;
+            // if (this->Zoom >= 90.0f)
+            //     this->Zoom = 90.0f;
         }
         void updateCameraVectors(){
             glm::vec3 position;
             position.x = cos(glm::radians(mYaw)) * cos(glm::radians(mPitch));
             position.y = sin(glm::radians(mPitch));
             position.z = sin(glm::radians(mYaw)) * cos(glm::radians(mPitch));
-            this->mPosition = 8.0f*glm::normalize(position);
-            glm::vec3 front = glm::vec3(0)- this->mPosition;
+            this->mPosition = this->Zoom*8.0f*glm::normalize(position);
+            glm::vec3 front = -(glm::vec3(0)- this->mPosition);
             //recalculate the right and up vector
             this->mRight = glm::normalize(glm::cross(front, this->mWorldUp));
             this->mUp = glm::normalize(glm::cross(this->mRight, front));

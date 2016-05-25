@@ -51,21 +51,25 @@ class Mesh{
                 else if(name == "texture_specular")
                     ss << specularNr++; // Transfer GLuint to stream
                 number = ss.str();
-
-                glUniform1f(glGetUniformLocation(shader.Program, ("material." + name + number).c_str()), i);
+                glUniform1f(glGetUniformLocation(shader.Program,
+                        (name + number).c_str()), i);
                 glBindTexture(GL_TEXTURE_2D, this->textures[i].id);
             }
+            //glUniform1i(glGetUniformLocation(shader.Program,
+            //        "number"), std::stoi(number, nullptr));
             // Also set each mesh's shininess property to a default value (if you want you could extend this to another mesh property and possibly change this value)
-            glUniform1f(glGetUniformLocation(shader.Program, "material.shininess"), 16.0f);
+            glUniform1f(glGetUniformLocation(shader.Program,
+                    "material.shininess"), 50.0f);
 
             // Draw mesh
             glBindVertexArray(this->VAO);
-            glDrawElements(GL_TRIANGLES, this->indices.size(), GL_UNSIGNED_INT, 0);
+            glDrawElements(GL_TRIANGLES, this->indices.size(),
+                    GL_UNSIGNED_INT, 0);
             glBindVertexArray(0);
 
             for (GLuint i = 0; i < this->textures.size(); i++){
-            glActiveTexture(GL_TEXTURE0 + i);
-            glBindTexture(GL_TEXTURE_2D, 0);
+                glActiveTexture(GL_TEXTURE0 + i);
+                glBindTexture(GL_TEXTURE_2D, 0);
             }
         }
     private:

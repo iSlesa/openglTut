@@ -65,10 +65,11 @@ int main(int argc, char** argv)
     // Enable depth testing
     glEnable(GL_DEPTH_TEST);
 
-    //Build and compiler our shaders
+    //Build and compiler our shamders
     Shader shader("shaders/vertex.shader", "shaders/fragment.shader");
     Shader lampShader("shaders/lampVertex.shader", "shaders/lampFrag.shader");
-    Model batMan("batman/Batman.obj");
+    Model nanoSuit("Joanna_Dark_Bounty_Hunter_rigged/Joanna_Dark.obj");
+    // Model nanoSuit("homer_x/homer.x");
 
    // The main loop ends when the window should close.
     while (!glfwWindowShouldClose(window)) {
@@ -82,13 +83,13 @@ int main(int argc, char** argv)
       glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
       //Draw the conatiner cube first
   	  glm::mat4 model;
-      model = glm::translate(model, glm::vec3(0.0f, -1.75f, 0.0f));
-      model = glm::scale(model, glm::vec3(0.2f));
+      model = glm::translate(model, glm::vec3(0.0f, -2.0f, 0.0f));
+      model = glm::scale(model, glm::vec3(0.1f));
       glm::mat4 view;
       view = cam.getViewMatrix();
       glm::mat4 projection;
-      projection = glm::perspective(glm::radians(cam.Zoom),
-            (float)SCREEN_WIDTH/SCREEN_HEIGHT, 0.1f, 100.0f);
+      projection = glm::perspective(120.0f,
+            (float)SCREEN_WIDTH/SCREEN_HEIGHT, 0.1f, 10000.0f);
       glm::mat4 mvp = projection * view * model;
       GLint modelLoc = glGetUniformLocation(shader.Program, "model");
       glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
@@ -102,23 +103,23 @@ int main(int argc, char** argv)
       glUniform3f(viewPosPos, cam.mPosition.x, cam.mPosition.y,
             cam.mPosition.z);
 
-      glm::vec3 lightColor;
-      lightColor.x = sin(glfwGetTime() * 2.0f);
-      lightColor.y = sin(glfwGetTime() * 0.7f);
-      lightColor.z = sin(glfwGetTime() * 1.3f);
-      glm::vec3 diffuseColor = lightColor * glm::vec3(0.5f); // Decrease the influence
-      glm::vec3 ambientColor = diffuseColor * glm::vec3(0.8f); // Low influence
-      glUniform3f(glGetUniformLocation(shader.Program, "light.ambient"),  ambientColor.x, ambientColor.y, ambientColor.z);
-      glUniform3f(glGetUniformLocation(shader.Program, "light.diffuse"),  diffuseColor.x, diffuseColor.y, diffuseColor.z);
-      glUniform3f(glGetUniformLocation(shader.Program, "light.specular"), 1.0f, 1.0f, 1.0f);
+     // glm::vec3 lightColor;
+    //  lightColor.x = sin(glfwGetTime() * 2.0f);
+    //  lightColor.y = sin(glfwGetTime() * 0.7f);
+    //  lightColor.z = sin(glfwGetTime() * 1.3f);
+    //  glm::vec3 diffuseColor = lightColor * glm::vec3(0.5f); // Decrease the influence
+     // glm::vec3 ambientColor = diffuseColor * glm::vec3(0.8f); // Low influence
+    //  glUniform3f(glGetUniformLocation(shader.Program, "light.ambient"),  ambientColor.x, ambientColor.y, ambientColor.z);
+    //  glUniform3f(glGetUniformLocation(shader.Program, "light.diffuse"),  diffuseColor.x, diffuseColor.y, diffuseColor.z);
+    //  glUniform3f(glGetUniformLocation(shader.Program, "light.specular"), 1.0f, 1.0f, 1.0f);
 
-      glUniform3f(glGetUniformLocation(shader.Program, "material.ambient"),   1.0f, 0.5f, 0.31f);
-      glUniform3f(glGetUniformLocation(shader.Program, "material.diffuse"),   1.0f, 0.5f, 0.31f);
-      glUniform3f(glGetUniformLocation(shader.Program, "material.specular"),  0.5f, 0.5f, 0.5f); // Specular doesn't have full effect on this object's material
-      glUniform1f(glGetUniformLocation(shader.Program, "material.shininess"), 50.0f);
+    //  glUniform3f(glGetUniformLocation(shader.Program, "material.ambient"),   1.0f, 0.5f, 0.31f);
+    //  glUniform3f(glGetUniformLocation(shader.Program, "material.diffuse"),   1.0f, 0.5f, 0.31f);
+    //  glUniform3f(glGetUniformLocation(shader.Program, "material.specular"),  0.5f, 0.5f, 0.5f); // Specular doesn't have full effect on this object's material
+    //  glUniform1f(glGetUniformLocation(shader.Program, "material.shininess"), 50.0f);
 
       shader.use();
-  	  batMan.Draw(shader);
+  	  nanoSuit.Draw(shader);
 
 
       glfwSwapBuffers(window);

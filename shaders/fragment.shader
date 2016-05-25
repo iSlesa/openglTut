@@ -25,6 +25,13 @@ uniform fLight light;
 uniform fMaterial material;
 uniform vec3 viewPos;
 
+uniform sampler2D texture_diffuse1;
+uniform sampler2D texture_diffuse2;
+uniform sampler2D texture_specular1;
+uniform sampler2D texture_specular2;
+
+uniform int number;
+
 void main(){
     // Ambient
     vec3 ambient = material.ambient * light.ambient;
@@ -40,5 +47,5 @@ void main(){
     vec3 specular = (spec * material.specular) * light.specular;
     //result
     vec3 result = ambient + diffuse + specular;
-    color = vec4(result, 1.0f);
+    color = vec4(texture(texture_diffuse1, textureCoor));
     }
